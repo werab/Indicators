@@ -8,7 +8,7 @@
 #property description "Moving Averages Convergence/Divergence"
 #property strict
 
-#include <MovingAverages.mqh>
+// #include <MovingAverages.mqh>
 
 //--- indicator settings
 #property  indicator_separate_window
@@ -51,8 +51,10 @@ int OnInit(void)
    return(INIT_SUCCEEDED);
   }
 */
+   return INIT_SUCCEEDED;
+}
 
-int IndicateTimedTrade(date dt)
+int IndicateTimedTrade(datetime  dt)
 {
    if (TimeMinute(dt) == 0)
       return BUY;
@@ -65,7 +67,7 @@ int IndicateTimedTrade(date dt)
 
 int IndicateCustomTrade()
 {
-  
+  return 0;
 }
 
 //+------------------------------------------------------------------+
@@ -82,16 +84,15 @@ int OnCalculate (const int rates_total,
                  const long& volume[],
                  const int& spread[])
   {
-    int i,limit;
+   int i,limit;
 //--- last counted bar will be recounted
-    limit=rates_total-prev_calculated;
-    if(prev_calculated>0)
+   limit=rates_total-prev_calculated;
+   if(prev_calculated>0)
       limit++;
 
-    for(i=0; i<limit; i++)
+   for(i=0; i<limit; i++){
       ExtTradeSignalBuffer[i] = IndicateTimedTrade(time[i]);
-    done
-
-    return(rates_total);
+   }
+   return(rates_total);
   }
 //+------------------------------------------------------------------+
