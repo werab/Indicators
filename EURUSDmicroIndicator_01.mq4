@@ -54,7 +54,7 @@ int OnInit(void)
    return INIT_SUCCEEDED;
 }
 
-int IndicateTimedTrade(datetime  dt)
+int IndicateTrade(datetime  dt)
 {
    if (TimeMinute(dt) == 0)
       return BUY;

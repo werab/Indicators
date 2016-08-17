@@ -24,8 +24,8 @@ input int SlowMaShift = 0;
 input int SlowMaMethod = 0;
 input int SlowMaAppliedTo = 0;
 
-input int AmountToLockIn = 5;
-input int BreakEvenBuffer = 10;
+input int AmountToLockIn = 1;
+input int BreakEvenBuffer = 5;
 
 double Shift;
 
