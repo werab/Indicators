@@ -24,7 +24,10 @@ input int SlowMaShift = 0;
 input int SlowMaMethod = 0;
 input int SlowMaAppliedTo = 0;
 
-double TPBuffer;
+input int AmountToLockIn = 5;
+input int BreakEvenBuffer = 10;
+
+double Shift;
 
 double ExtM5Buffer[];
 double ExtM21Buffer[];
@@ -41,7 +44,8 @@ int OnInit()
 //--- indicator buffers mapping
    if(Digits==3 || Digits==5) pt=10*Point;   else   pt=Point;
    
-   TPBuffer = MarketInfo(Symbol(), MODE_STOPLEVEL);
+   double StopLevel = MarketInfo(Symbol(), MODE_STOPLEVEL);
+   Shift = (MathMax(StopLevel, AmountToLockIn + BreakEvenBuffer))*pt;
    
    IndicatorDigits(Digits);
 
@@ -58,8 +62,8 @@ int OnInit()
 //---- index labels
    SetIndexLabel(0,"M5");
    SetIndexLabel(1,"M21");
-   SetIndexLabel(2,"Bid - TPBuffer");
-   SetIndexLabel(3,"Ask + TPBuffer");
+   SetIndexLabel(2,"Bid - (AmountToLockIn + BreakEvenBuffer)");
+   SetIndexLabel(3,"Ask + (AmountToLockIn + BreakEvenBuffer)");
 //---
    return(INIT_SUCCEEDED);
   }
@@ -85,8 +89,8 @@ int OnCalculate(const int rates_total,
       //---- ma_shift set to 0 because SetIndexShift called abowe
       ExtM5Buffer[i] = iMA(NULL,0,FastMa,FastMaShift, FastMaMethod, FastMaAppliedTo, i);
       ExtM21Buffer[i] = iMA(NULL,0,SlowMa,SlowMaShift, SlowMaMethod, SlowMaAppliedTo,i);
-      ExtBid_TPBuffer[i] = Bid - (TPBuffer*Point);
-      ExtAsk_TPBuffer[i] = Ask + (TPBuffer*Point);
+      ExtBid_TPBuffer[i] = Bid - Shift;
+      ExtAsk_TPBuffer[i] = Ask + Shift;
      }
 //--- return value of prev_calculated for next call
    return(rates_total);
