@@ -56,10 +56,12 @@ int OnInit(void)
 
 int IndicateTimedTrade(datetime  dt)
 {
-   if (TimeMinute(dt) == 0)
+//   if (MathMod(TimeMinute(dt),10) == 5)
+   if (TimeMinute(dt) == 15 || TimeMinute(dt) == 45)
       return BUY;
 
-   if (TimeMinute(dt) == 30)
+//   if (MathMod(TimeMinute(dt),10) == 0)
+   if (TimeMinute(dt) == 0 || TimeMinute(dt) == 30)
       return SELL;
 
    return 0;

@@ -15,7 +15,7 @@
 #property  indicator_buffers 1
 #property  indicator_color1  Silver
 //--- indicator parameters
-input string Indicator="default";
+input int iMA_value = 75;
 
 //input string ParamsAsList="";
 //--- indicator buffers
@@ -54,13 +54,28 @@ int OnInit(void)
    return INIT_SUCCEEDED;
 }
 
-int IndicateTrade(datetime  dt)
+double ND(double val)
 {
-   if (TimeMinute(dt) == 0)
-      return BUY;
+   return(NormalizeDouble(val, Digits));
+}
 
-   if (TimeMinute(dt) == 30)
+int IndicateTrade(int i)
+{
+   double preprevious = ND(iMA(NULL,PERIOD_M5,iMA_value,0, MODE_EMA, PRICE_CLOSE, i+3));
+   double previous = ND(iMA(NULL,PERIOD_M5,iMA_value,0, MODE_EMA, PRICE_CLOSE, i+2));
+   double current = ND(iMA(NULL,PERIOD_M5,iMA_value,0, MODE_EMA, PRICE_CLOSE, i+1));
+   
+//   Comment("current: "+ (string)current+" previous: "+ (string)previous + " preprevious: "+(string)preprevious);
+   
+   if (previous<current && previous<preprevious){
+//      Print("BUY: previous<current: "+ DoubleToStr(previous,Digits)+"<"+DoubleToStr(current,Digits)+" && previous<preprevious: "+DoubleToStr(previous,Digits)+"<"+DoubleToStr(preprevious,Digits));
+      return BUY;
+   }
+
+   if (previous>current && previous>preprevious){
+//      Print("BUY: previous>current: "+ DoubleToStr(previous,Digits)+">"+DoubleToStr(current,Digits)+" && previous>preprevious: "+DoubleToStr(previous,Digits)+">"+DoubleToStr(preprevious,Digits));
       return SELL;
+   }
 
    return 0;
 }
@@ -83,11 +98,12 @@ int OnCalculate (const int rates_total,
    int i,limit;
 //--- last counted bar will be recounted
    limit=rates_total-prev_calculated;
-   if(prev_calculated>0)
-      limit++;
+
+//   if(prev_calculated>0)
+//      limit++;
 
    for(i=0; i<limit; i++){
-      ExtTradeSignalBuffer[i] = IndicateTimedTrade(time[i]);
+      ExtTradeSignalBuffer[i] = IndicateTrade(i);
    }
    return(rates_total);
   }
