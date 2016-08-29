@@ -15,7 +15,7 @@
 #property  indicator_buffers 1
 #property  indicator_color1  Silver
 //--- indicator parameters
-input int iMA_value = 75;
+input int rsiPeriod = 14;
 
 //input string ParamsAsList="";
 //--- indicator buffers
@@ -24,6 +24,18 @@ double    ExtTradeSignalBuffer[];
 // bool      ExtParameters=false;
 static int SELL = -1;
 static int BUY = 1;
+
+double upperRSIBound = 70;
+double lowerRSIBound = 30;
+
+double upperMACDBound = 0.0005;
+double lowerMACDBound = -0.0005;
+
+int iFastEMA = 12;
+int iSlowEMA = 26;
+
+int iATRPeriod = 14;
+double dLowerATRBound = 0.00075;
 
 //+------------------------------------------------------------------+
 //| Custom indicator initialization function                         |
@@ -61,22 +73,39 @@ double ND(double val)
 
 int IndicateTrade(int i)
 {
+/*
    double preprevious = ND(iMA(NULL,PERIOD_M5,iMA_value,0, MODE_EMA, PRICE_CLOSE, i+3));
    double previous = ND(iMA(NULL,PERIOD_M5,iMA_value,0, MODE_EMA, PRICE_CLOSE, i+2));
    double current = ND(iMA(NULL,PERIOD_M5,iMA_value,0, MODE_EMA, PRICE_CLOSE, i+1));
    
-//   Comment("current: "+ (string)current+" previous: "+ (string)previous + " preprevious: "+(string)preprevious);
+   Comment("current: "+ (string)current+" previous: "+ (string)previous + " preprevious: "+(string)preprevious);
+*/
+
+   double previous = iMACD(NULL, PERIOD_M5, iFastEMA, iSlowEMA, 9, PRICE_CLOSE, MODE_MAIN, i+2);
+   double current = iMACD(NULL, PERIOD_M5, iFastEMA, iSlowEMA, 9, PRICE_CLOSE, MODE_MAIN, i+1);
    
-   if (previous<current && previous<preprevious){
-//      Print("BUY: previous<current: "+ DoubleToStr(previous,Digits)+"<"+DoubleToStr(current,Digits)+" && previous<preprevious: "+DoubleToStr(previous,Digits)+"<"+DoubleToStr(preprevious,Digits));
-      return BUY;
+   double dATR = iATR(NULL, PERIOD_M5, iATRPeriod, i+1);
+   
+   if (dATR >= dLowerATRBound){
+      if (current > 0 && previous < 0)
+         return BUY;
+         
+      if (current < 0 && previous > 0)
+         return SELL;
    }
-
-   if (previous>current && previous>preprevious){
-//      Print("BUY: previous>current: "+ DoubleToStr(previous,Digits)+">"+DoubleToStr(current,Digits)+" && previous>preprevious: "+DoubleToStr(previous,Digits)+">"+DoubleToStr(preprevious,Digits));
-      return SELL;
+ /*  
+   if (iRSI(NULL,PERIOD_M5,rsiPeriod, PRICE_CLOSE, i+1) > upperRSIBound){
+      if ( iMACD(NULL, PERIOD_M5, iFastEMA, iSlowEMA, 9, PRICE_MEDIAN, MODE_MAIN, i) > upperMACDBound){
+         return SELL;
+      }
    }
-
+   
+   if (iRSI(NULL,PERIOD_M5,rsiPeriod, PRICE_CLOSE, i+1) < lowerRSIBound){
+      if ( iMACD(NULL, PERIOD_M5, iFastEMA, iSlowEMA, 9, PRICE_MEDIAN, MODE_MAIN, i) < lowerMACDBound){
+         return BUY;
+      }
+   }
+*/
    return 0;
 }
 
